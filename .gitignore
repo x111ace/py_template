@@ -1,0 +1,63 @@
+# Python virtual environments
+.env
+.venv/
+venv/
+ENV/
+env/
+
+# Python bytecode and cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Project-specific caches
+src/__pycache__/
+src/mods/__pycache__/
+
+# Test and coverage outputs
+.pytest_cache/
+tests/__pycache__/
+.coverage
+.tox/
+.nox/
+.mypy_cache/
+coverage.xml
+htmlcov/
+.cache/
+
+# IDE/editor settings
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+*.code-workspace
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+*.manifest
+*.spec
+
+# Logs and local data
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+
+# Node modules (in case of JS tooling)
+node_modules/
+
+# Cursor IDE context/indexing
+.cursor/
+.cursorrules
+.cursorignore
+.cursorindexingignore
+
+# Personal
