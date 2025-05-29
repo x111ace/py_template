@@ -9,5 +9,5 @@ from . import MainMenu
 @dataclass
 class ExampleNode(BaseNode[AppState]):
     async def run(self, ctx: GraphRunContext[AppState]) -> MainMenu:
-        printR("\nHello.\nHello,\nHello.\nHello, from `ExampleNode`! Returning to `MainMenu`...")
+        printR("Hello, from `ExampleNode`! Returning to `MainMenu`...")
         return MainMenu()
