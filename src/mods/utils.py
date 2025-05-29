@@ -36,12 +36,12 @@ def print_project_tree(ROOT, output=False):
     Returns:
         str: The formatted file tree.
     """
-    # [engineering] Ensure folders are always listed before files, both sorted alphabetically.
+    # [engineering] Ignore __pycache__ and .git folders. Folders before files, both sorted alphabetically.
     tree_lines = []
 
     def _tree(dir_path, prefix=""):
-        # Exclude __pycache__ and sort: folders first, then files, both alphabetically
-        entries = [e for e in os.listdir(dir_path) if e != "__pycache__"]
+        # Exclude __pycache__ and .git folders
+        entries = [e for e in os.listdir(dir_path) if e not in ("__pycache__", ".git", "venv", "venv_test")]
         folders = sorted([e for e in entries if os.path.isdir(os.path.join(dir_path, e))])
         files = sorted([e for e in entries if not os.path.isdir(os.path.join(dir_path, e))])
         sorted_entries = folders + files

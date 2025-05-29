@@ -4,61 +4,57 @@
 # --- Import Project Modules --- #
 ##################################
 
-"""
-Obj:
-    - 1: Import project modules
-    - 2: Define Library Imports
-"""
-
-# Obj: - 1:
+from mods.graph.app import AppState, MainMenu
 from mods import __init__, utils
 
-# Obj: - 2:
+from pydantic_graph import Graph
+import asyncio
 import os
 
 ###################################
 # --- Define from __init__.py --- #
 ###################################
 
-"""
-Obj:
-    - 1: Set variables for directories in `__init__.py`
-    - 2: Set variables for functions in `utils.py`
-    - 3: Define script variables for directories
-"""
+PY_PATH_MAIN = os.path.abspath(__file__)
 
-# Obj: - 1:
-MODULES_DIR = __init__.MODULES_DIR # py_template\src\mods
 SOURCE_CODE_DIR = __init__.SOURCE_CODE_DIR # py_template\src
+SRC_DIR = os.path.dirname(PY_PATH_MAIN)
+if SRC_DIR != SOURCE_CODE_DIR:
+    print(f"SRC_DIR != SOURCE_CODE_DIR...")
+else:
+    SOURCE_CODE_DIR = SRC_DIR
+
+MODULES_DIR = __init__.MODULES_DIR # py_template\src\mods
+MODS_DIR = os.path.join(SRC_DIR, 'mods')
+if MODS_DIR != MODULES_DIR:
+    print(f"MODS_DIR != MODULES_DIR...")
+else:
+    MODULES_DIR = MODS_DIR
+
 FULL_PROJECT_ROOT = __init__.FULL_PROJECT_ROOT # py_template
+ROOT_DIR = os.path.dirname(SRC_DIR)
+if ROOT_DIR != FULL_PROJECT_ROOT:
+    print(f"ROOT_DIR != FULL_PROJECT_ROOT...")
+else:
+    FULL_PROJECT_ROOT = ROOT_DIR
 
 # Obj: - 2:
 printR = utils.printR 
 FILEi = utils.print_file_path 
 TR33 = utils.print_project_tree
 
-# Obj: - 3:
-PY_PATH_MAIN = os.path.abspath(__file__)
-
-SRC_DIR = os.path.dirname(PY_PATH_MAIN)
-SOURCE_CODE_DIR = SRC_DIR
-
-MODS_DIR = os.path.join(SRC_DIR, 'mods')
-MODULES_DIR = MODS_DIR
-
-ROOT_DIR = os.path.dirname(SRC_DIR)
-FULL_PROJECT_ROOT = ROOT_DIR
-
 # --- --- --- --- --- --- --- --- ---
 
 def main():
-    FILEi(
-        FILE=MODULES_DIR,
-        MODS=SOURCE_CODE_DIR,
-        ROOT=FULL_PROJECT_ROOT
-    )
-    
-    TR33(ROOT=FULL_PROJECT_ROOT)
+    initial_node = MainMenu()
+    state = AppState()
+    app_graph = Graph(
+        nodes=(MainMenu,), # ADD NODES HERE
+        state_type=AppState)
+    asyncio.run(app_graph.run(initial_node, state=state))
+
 
 if __name__ == "__main__":      
     main()
+    TR33(ROOT=FULL_PROJECT_ROOT, output=True)
+    FILEi(MOD=MODULES_DIR, DIR=SOURCE_CODE_DIR, ROOT=FULL_PROJECT_ROOT, output=True)
