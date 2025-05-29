@@ -1,16 +1,11 @@
 # src/run.py
 
-import os, sys
-
-sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
+import os
 
 PY_PATH_RUN = os.path.abspath(__file__)
 
-# --- --- --- --- --- --- --- --- ---
-
-def run():
-    from main import main
-    main()
-
 if __name__ == "__main__":
-    run()
+    from src.main import main
+    main()
+    from src.mods.utils import clean
+    clean()

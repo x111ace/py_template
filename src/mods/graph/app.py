@@ -1,24 +1,13 @@
-from pydantic_graph import BaseNode, GraphRunContext, End
+from pydantic_graph import BaseNode, GraphRunContext
 from dataclasses import dataclass
+
 from ..utils import printR
 
-# STATE
-class AppState:
-    pass
+from . import AppState
+from . import MainMenu
 
-# FORWARD DECLARATION
-class MainMenu(BaseNode[AppState]): ...
-
-# MAIN NODE
 @dataclass
-class MainMenu(BaseNode[AppState]):
-    async def run(self, ctx: GraphRunContext[AppState]) -> End:
-        print("\n--- MAIN MENU ---\n"
-              "\n[0] Exit\n")
-        while True:
-            main_menu_option = input("> ")
-            if main_menu_option == "0":
-                printR("\nExiting...")
-                return End(None)
-            else:
-                printR("\nInvalid choice. Please try again.\n", speed=0.01)
+class ExampleNode(BaseNode[AppState]):
+    async def run(self, ctx: GraphRunContext[AppState]) -> MainMenu:
+        printR("\nHello.\nHello,\nHello.\nHello, from `ExampleNode`! Returning to `MainMenu`...")
+        return MainMenu()

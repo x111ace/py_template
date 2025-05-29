@@ -4,8 +4,10 @@
 # --- Import Project Modules --- #
 ##################################
 
-from mods.graph.app import AppState, MainMenu
-from mods import __init__, utils
+from src.mods.graph import AppState, MainMenu
+from src.mods.graph.app import ExampleNode
+
+from src.mods import __init__, utils
 
 from pydantic_graph import Graph
 import asyncio
@@ -49,7 +51,7 @@ def main():
     initial_node = MainMenu()
     state = AppState()
     app_graph = Graph(
-        nodes=(MainMenu,), # ADD NODES HERE
+        nodes=(MainMenu, ExampleNode), # ADD NODES HERE
         state_type=AppState)
     asyncio.run(app_graph.run(initial_node, state=state))
 

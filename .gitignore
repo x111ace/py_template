@@ -13,6 +13,9 @@ __pycache__/
 # Project-specific caches
 src/__pycache__/
 src/mods/__pycache__/
+src/mods/graph/__pycache__/
+src/mods/graph/node/__pycache__/
+
 
 # Test and coverage outputs
 .pytest_cache/

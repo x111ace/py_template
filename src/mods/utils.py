@@ -15,7 +15,7 @@ Obj:
 from .__init__ import *
 
 # Obj: - 2:
-import os, sys, time
+import os, sys, time, shutil
 
 PY_PATH_UTILS = os.path.abspath(__file__)
 
@@ -94,14 +94,26 @@ def print_file_path(MOD, DIR, ROOT, output=False):
         print(paths_to_print)
     return mod_path, dir_path, root_path
 
+def clean():
+    """
+    Clean the project's __pycache__ folder.
+    """
+    for root, dirs, files in os.walk(SOURCE_CODE_DIR):
+        for dir in dirs:
+            if dir == "__pycache__":
+                pycache_path = os.path.join(root, dir)
+                shutil.rmtree(pycache_path)
+        
 #####################################
 # --- CLI / Terminal Operations --- #
 #####################################
 
-def printR(text, speed=0.03, mode=None, end='\n', flush=True):
+def printR(text, speed=0.03, end='\n', flush=True, mode=None, elipses=False):
     """
     Print the given text to stdout one character at a time, with a speed between each character,
     and optionally transform the text using 'mode' (upper, lower, reverse).
+    Adds a longer pause after punctuation for more natural pacing.
+    If elipses=False, ellipses ("...") print at normal speed and are treated as mid-sentence punctuation; if True, they animate.
 
     Args:
         text (str): The text to print.
@@ -109,6 +121,7 @@ def printR(text, speed=0.03, mode=None, end='\n', flush=True):
         end (str): String appended after the last character. Default is newline.
         flush (bool): Whether to flush after each character. Default is True.
         mode (str|None): Optional text transformation: 'upper', 'lower', 'reverse'.
+        elipses (bool): Whether to animate ellipses. Default is True.
     """
     # If speed is a string and matches a mode, treat as mode for backward compatibility.
     _mode = speed if isinstance(speed, str) else None
@@ -117,19 +130,19 @@ def printR(text, speed=0.03, mode=None, end='\n', flush=True):
     # Mode-based configuration for speed
     if _mode in ("fastr", "fast", "normal", "slow", "instant"):
         if _mode == "fastr":
-            _speed = 0.005
+            _speed = 0.00639
         elif _mode == "fast":
-            _speed = 0.01
+            _speed = 0.012
         elif _mode == "normal":
-            _speed = 0.02
+            _speed = 0.024
         elif _mode == "slow":
-            _speed = 0.03
+            _speed = 0.036
         elif _mode == "instant":
             _speed = 0
     elif isinstance(speed, (int, float)):
         _speed = speed
     elif speed == "":
-        _speed = 0.02
+        _speed = 0.024
 
     # Text transformation via mode
     if mode == "reverse":
@@ -141,7 +154,7 @@ def printR(text, speed=0.03, mode=None, end='\n', flush=True):
     else:
         text = str(text)
 
-    # Print logic
+    # Print logic with punctuation pause
     if _speed == 0:
         sys.stdout.write(text)
         sys.stdout.write(end)
@@ -149,11 +162,67 @@ def printR(text, speed=0.03, mode=None, end='\n', flush=True):
             sys.stdout.flush()
         return
 
-    for char in text:
+    mid_sentence_punctuation = {'-', '—', ',', ';', ':'}
+    end_sentence_punctuation = {'.', '!', '?'}
+
+    i = 0
+    text_len = len(text)
+    while i < text_len:
+        # Check for ellipsis "..."
+        if text[i:i+3] == "..." and elipses:
+            ellipsis_speed = _speed * 8
+            for _ in range(3):
+                sys.stdout.write(".")
+                if flush:
+                    sys.stdout.flush()
+                time.sleep(ellipsis_speed)
+            for _ in range(3):
+                sys.stdout.write("\b \b")
+                if flush:
+                    sys.stdout.flush()
+                time.sleep(ellipsis_speed)
+            for _ in range(3):
+                sys.stdout.write(".")
+                if flush:
+                    sys.stdout.flush()
+                time.sleep(ellipsis_speed)
+            for _ in range(3):
+                sys.stdout.write("\b \b")
+                if flush:
+                    sys.stdout.flush()
+                time.sleep(ellipsis_speed)
+            for _ in range(3):
+                sys.stdout.write(".")
+                if flush:
+                    sys.stdout.flush()
+                time.sleep(ellipsis_speed)
+            if flush:
+                sys.stdout.flush()
+            time.sleep(_speed * 3)
+            i += 3
+            continue
+        elif text[i:i+3] == "..." and not elipses:
+            # Print the ellipsis at normal speed, but treat as mid-sentence punctuation for pause
+            for j in range(3):
+                sys.stdout.write(".")
+                if flush:
+                    sys.stdout.flush()
+                time.sleep(_speed)
+            # After printing "...", pause as if it were mid-sentence punctuation
+            time.sleep(_speed * 8)
+            i += 3
+            continue
+        char = text[i]
         sys.stdout.write(char)
         if flush:
             sys.stdout.flush()
-        time.sleep(_speed)
+        if char in end_sentence_punctuation:
+            time.sleep(_speed * 14)
+        elif char in mid_sentence_punctuation:
+            time.sleep(_speed * 8)
+        else:
+            time.sleep(_speed)
+        i += 1
     sys.stdout.write(end)
     if flush:
         sys.stdout.flush()
