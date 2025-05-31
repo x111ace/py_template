@@ -4,18 +4,7 @@
 # --- Import Project Modules --- #
 ##################################
 
-"""
-Obj:
-    - 1: Import project modules
-    - 2: Define Library Imports
-    - 3: Define script variables for directories
-"""
-
-# Obj: - 1:
 from .__init__ import *
-
-# Obj: - 2:
-import os, sys, time, shutil
 
 PY_PATH_UTILS = os.path.abspath(__file__)
 
@@ -41,7 +30,7 @@ def print_project_tree(ROOT, output=False):
 
     def _tree(dir_path, prefix=""):
         # Exclude __pycache__ and .git folders
-        entries = [e for e in os.listdir(dir_path) if e not in ("__pycache__", ".git", "venv", "venv_test")]
+        entries = [e for e in os.listdir(dir_path) if e not in ("__pycache__", ".pytest_cache", ".git", "venv", "venv_test")]
         folders = sorted([e for e in entries if os.path.isdir(os.path.join(dir_path, e))])
         files = sorted([e for e in entries if not os.path.isdir(os.path.join(dir_path, e))])
         sorted_entries = folders + files
@@ -98,9 +87,9 @@ def clean():
     """
     Clean the project's __pycache__ folder.
     """
-    for root, dirs, files in os.walk(SOURCE_CODE_DIR):
+    for root, dirs, files in os.walk(ROOTPTH):
         for dir in dirs:
-            if dir == "__pycache__":
+            if dir in ("__pycache__", ".pytest_cache"):
                 pycache_path = os.path.join(root, dir)
                 shutil.rmtree(pycache_path)
         

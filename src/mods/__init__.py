@@ -1,14 +1,56 @@
 # py_template/src/mods/__init__.py
 
-import os
+from pydantic_graph import BaseNode, GraphRunContext, End
+from typing import Optional, Union, List, Dict, Any
+from dataclasses import dataclass, field
+from datetime import datetime
 
-MODULES_DIR = os.path.dirname(os.path.abspath(__file__))
-SOURCE_CODE_DIR = os.path.abspath(os.path.join(MODULES_DIR, '..'))
-FULL_PROJECT_ROOT = os.path.abspath(os.path.join(SOURCE_CODE_DIR, '..'))
+import os, re, sys, glob, time, shutil, logging, collections
 
-ENV_PATH = os.path.join(FULL_PROJECT_ROOT, '.env')
+from colorama import init, Fore, Style
+init(autoreset=True)
+nrm = Style.RESET_ALL
+red = Fore.RED
+grn = Fore.GREEN
+yel = Fore.YELLOW
+blu = Fore.BLUE
+mag = Fore.MAGENTA
+
+# Custom logging formatter to color levelname by log level
+handler = logging.StreamHandler()
+class ColorFormatter(logging.Formatter):
+    LEVEL_COLORS = {
+        logging.ERROR: red,
+        logging.WARNING: yel,
+        logging.INFO: grn,
+        logging.DEBUG: blu,
+        logging.CRITICAL: mag,
+    }
+    BASE_FORMAT = '\n(%(asctime)s) ***{color}%(levelname)s{reset}***\n: %(message)s'
+
+    def format(self, record):
+        color = self.LEVEL_COLORS.get(record.levelno, nrm)
+        fmt = self.BASE_FORMAT.format(color=color, reset=nrm)
+        formatter = logging.Formatter(fmt, datefmt='%#m/%#d/%Y, %#H:%M:%S')
+        return formatter.format(record)
+
+handler.setFormatter(ColorFormatter())
+logging.basicConfig(
+    level=logging.INFO,
+    handlers=[handler],
+    force=True
+)
+
+MOD_DIR = os.path.dirname(os.path.abspath(__file__))
+SRC_DIR = os.path.abspath(os.path.join(MOD_DIR, '..'))
+ROOTPTH = os.path.abspath(os.path.join(SRC_DIR, '..'))
+
+ENV_PATH = os.path.join(ROOTPTH, '.env')
 
 ind1_4 = "    "
 ind2_4 = "        "
 ind3_4 = "            "
 ind4_4 = "                "
+
+from dotenv import load_dotenv
+load_dotenv(dotenv_path=ENV_PATH)
