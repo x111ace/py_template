@@ -3,12 +3,12 @@
 from ....mods import *
 from ...utils import *
 
-from . import TestState, MainTestNODE
+from . import InnerState, MainNODE
 
 @dataclass
-class TestNODE(BaseNode[TestState]): # EXAMPLE NODE
-    async def run(self, ctx: GraphRunContext[TestState]
-                  ) -> MainTestNODE: # SHOW THE POSSIBLE NODES TO RETURN
+class TestNODE(BaseNode[InnerState]): # EXAMPLE NODE
+    async def run(self, ctx: GraphRunContext[InnerState]
+                  ) -> MainNODE: # SHOW THE POSSIBLE NODES TO RETURN
                   # USE `Union[End, NodeName]` FOR MULTIPLE NODES
-        printR("\nHello, from `TestNODE`! Returning to `MainTestNODE`...", speed=0.01)
-        return MainTestNODE()
+        printR("\nHello, from `TestNODE`! Returning to `MainNODE`...", speed=0.01)
+        return MainNODE()

@@ -3,12 +3,26 @@
 from ...mods import *
 from ..utils import *
 
+"""
+To add a new node:
+1. Create a new file, using `example.py` as a reference.
+2. Add a forward declaration for the new node in this file.
+3. Add the node to the menu print statement, for display.
+4. Add an `elif` statement for the new node in the `MainMenu`.
+5. In `main.py`, import the node, and add it in the execution function.
 
+To add a new graph:
+1. Create a new folder, naming it as you wish for the new graph.
+2. Use `test/` as a reference for the folder and file structure.
+3. Create a main entry node and execute function in `__init__.py`.
+4. Create new nodes as needed in the new folder, each as it's own file.
+5. Replicate the entry from option `2` in `MainMenu` for the new graph.
+"""
 
 # MAIN APP STATE
 class AppState(BaseModel):
+    i_graph_: Optional[List[Dict[str, Any]]] = None
     exit_app: bool = False
-    inner_graph_snapshots: Optional[List[Dict[str, Any]]] = None
 
 
 
@@ -21,7 +35,7 @@ class ExampleNode(BaseNode[AppState]): ...
 @dataclass
 class MainMenu(BaseNode[AppState]): # INIT/MAIN NODE
     async def run(self, ctx: GraphRunContext[AppState]
-                  ) -> Union[End, ExampleNode, 'MainMenu']: # Use string literal for self-reference
+                  ) -> Union[End, ExampleNode]: # Use string literal for self-reference
         print("\n--- MAIN MENU ---\n"
               "\n[0] Exit\n"
               "\n[1] Example Node"
@@ -49,35 +63,24 @@ class MainMenu(BaseNode[AppState]): # INIT/MAIN NODE
 
 
             elif main_menu_option == "2":
+                if ctx.state.i_graph_ is not None:
+                    ctx.state.i_graph_ = None
+
                 # ADD GRAPH IMPORT HERE 
                 from .test import test_graph
-                # IMPORTANT: Clear the snapshots from AppState *before* returning.
-                # This ensures they are part of the persisted state for *this* MainMenu completion,
-                # but AppState is clean for the *next* node transition.
-                if ctx.state.inner_graph_snapshots is not None:
-                    ctx.state.inner_graph_snapshots = None 
-                else:
-                    printR("\nNo snapshots to clear.", speed=0.01)
-                # test_graph returns a tuple: (exit_status, snapshots_data)
-                should_exit_main_app, returned_snapshots = await test_graph()
-                # Store the returned snapshots in the current AppState
-                ctx.state.inner_graph_snapshots = returned_snapshots
-                
+                # RUN INNER GRAPH AND RETURN SNAPSHOTS OR EXIT FLAG
+                exit_flag, returned_snapshots = await test_graph()
+
+                ctx.state.i_graph_ = returned_snapshots
                 node_to_return = None
-                if should_exit_main_app:
+                if exit_flag:
                     ctx.state.exit_app = True 
                     node_to_return = End(None)
                 else:
-                    # If inner graph didn't signal exit, return to MainMenu
                     node_to_return = MainMenu()
-
                 return node_to_return
+            
+
+            
             else:
                 printR("\nInvalid choice. Please try again.", speed=0.01)
-                # Loop back by continuing the while loop, or explicitly return MainMenu() if preferred
-                # If we just continue, the prompt reappears. Returning MainMenu() also achieves this.
-                # Let's be explicit for clarity of state transition
-                return MainMenu()
-        # This part should ideally not be reached if all paths in while loop return.
-        # However, as a fallback or if loop structure changes, it ensures an End.
-        # return End(None) 

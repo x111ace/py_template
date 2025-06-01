@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 from datetime import datetime
 from pathlib import Path
 
-import os, re, sys, glob, time, shutil, asyncio, logging, collections
+import os, re, sys, glob, time, shutil, signal, asyncio, logging, collections
 
 from colorama import init, Fore, Style
 init(autoreset=True)

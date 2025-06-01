@@ -1,6 +1,6 @@
 # src/run.py
 
-import os, sys, signal
+from src.mods import *
 
 PY_PATH_RUN = os.path.abspath(__file__)
 
@@ -16,7 +16,7 @@ if __name__ == "__main__":
         from src.main import main
         main()
     except Exception as e:
-        print(f"Error: {e}")
+        logging.error(f"Error: {e}")
     finally:
         from src.mods.utils import clean
         clean()

@@ -13,7 +13,6 @@ from src.mods.utils import *
 
 from pydantic_graph.persistence.file import FileStatePersistence # Added import
 from pydantic_graph import Graph
-# import os, asyncio
 
 ###################################
 # --- Define from __init__.py --- #
@@ -44,14 +43,17 @@ TR33 = print_project_tree
 
 # --- --- --- --- --- --- --- --- ---
 
-def main_graph():
+def main_graph(persist=True):
     initial_node = MainMenu()
     state = AppState()
     app_graph = Graph(
         nodes=(MainMenu, ExampleNode), # ADD NODES HERE
         state_type=AppState)
 
-    # --- Persistence Setup ---
+    # Clear persistence file to start auto start fresh
+    if persist == False and APP_PERSISTENCE_FILE.exists():
+        os.remove(APP_PERSISTENCE_FILE)
+
     persistence = FileStatePersistence(APP_PERSISTENCE_FILE)
     persistence.set_graph_types(app_graph) # Register graph types
 
@@ -66,7 +68,7 @@ def main_graph():
             try:
                 os.remove(APP_PERSISTENCE_FILE)
             except Exception as e:
-                print(f"[WARNING] Could not clear old persistence file: {e}")
+                logging.warning(f"Could not clear old persistence file\n: {e}")
 
         async with app_graph.iter(start_node, state=current_state, persistence=persistence) as run:
             while True:
@@ -77,11 +79,13 @@ def main_graph():
                 # print(f"Next node: {type(next_node_or_end).__name__}") # Optional: for debugging
 
     asyncio.run(run_with_persistence())
-    # Clear persistence file automatically after execution
-    os.remove(APP_PERSISTENCE_FILE)
+    
+    # Clear persistence file to start auto start fresh
+    if persist == False and APP_PERSISTENCE_FILE.exists():
+        os.remove(APP_PERSISTENCE_FILE)
 
 def main():
     # FILEi(MOD=MOD_DIR, DIR=SRC_DIR, ROOT=ROOTPTH, output=True)
     # TR33(ROOT=ROOTPTH, output=True)
-    main_graph()
+    main_graph(persist=False)
 

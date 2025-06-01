@@ -28,5 +28,4 @@ def run_tests():
 
 if __name__ == "__main__":
     sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
-    print(sys.path)
     run_tests()

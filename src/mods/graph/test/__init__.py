@@ -1,32 +1,43 @@
 # src/mods/graph/test/__init__.py
 
-from pydantic_graph.persistence.in_mem import FullStatePersistence # Corrected import
+from pydantic_graph.persistence.in_mem import FullStatePersistence
 from pydantic_graph import Graph
 import pydantic
 
 from ....mods import *
 from ...utils import *
 
-
+"""
+To add a new node:
+1. Create a new file, using `testnode.py` as a reference.
+2. Add a forward declaration for the new node in this file.
+3. Add the node to the menu print statement, for display.
+4. Add an `elif` statement for the new node in the `MainNODE`.
+5. Import and add the new node to the execution function.
+"""
 
 # NEW GRAPH STATE
-class TestState(BaseModel):
+class InnerState(BaseModel):
     exit_app: bool = False
+
+
 
 # ADD FORWARD DECLARATION FOR ALL NODES HERE
 # ENSURE IT USES THE CORRECT NODE CLASS NAME
-class TestNODE(BaseNode[TestState]): ...
+class TestNODE(BaseNode[InnerState]): ...
+
+
 
 @dataclass
-class MainTestNODE(BaseNode[TestState]): # INIT/MAIN NODE
-    async def run(self, ctx: GraphRunContext[TestState]
+class MainNODE(BaseNode[InnerState]): # INIT/MAIN NODE
+    async def run(self, ctx: GraphRunContext[InnerState]
                   ) -> Union[End, TestNODE]: # ADD NODES HERE
-        print("\nTHIS IS A GRAPH INSIDE OF A GRAPH\n"
-              "\n--- GRAPH MENU ---\n"
-              "\n[M] Return to Main Menu\n"
+        print("\n--- GRAPH MENU ---\n"
+              "\n[0] Exit\n"
               "\n[1] Test NODE"
             # "\n[2] Newly Created"
             # "\n[3] Newly Created"
+              "\n\n[M] Main Menu"
             )
         
         while True:
@@ -37,8 +48,8 @@ class MainTestNODE(BaseNode[TestState]): # INIT/MAIN NODE
                 printR("\nReturning to Main Menu...", speed=0.01)
                 return End(None)
             elif graph_option == "0":
-                ctx.state.exit_app = True
                 printR("\nExiting...", speed=0.01)
+                ctx.state.exit_app = True
                 return End(None)
             
             # THIS EXAMPLE NODE WILL BE REPLACED WITH A CREATED NODE
@@ -53,42 +64,41 @@ class MainTestNODE(BaseNode[TestState]): # INIT/MAIN NODE
 
 
 
-# --- --- --- --- --- ------ --- ---
-
-
-
 async def test_graph():
     printR("\nHello, from `ExampleGraph`! Beginning a new graph...", speed=0.01)
-    final_test_state = None
     session_snapshots: Optional[List[Dict[str, Any]]] = [] # Initialize as empty list
-    
-    # Use in-memory FullStatePersistence for this run of the inner graph
-    # A new instance is created each time test_graph is called, so history is fresh.
+    # Use in-memory FullStatePersistence to track the inner graph's session snapshots
+    # New instance is created each time the inner graph is called, with fresh history.
     in_memory_persistence = FullStatePersistence()
-    # in_memory_persistence.deep_copy = False # Optional: if state/nodes are simple and deep copies are slow
+    final_state = None
 
-    from .testnode import TestNODE # Ensure TestNODE is imported correctly
+    # IMPORT NODES HERE TO AVOID CIRCULAR IMPORTS
+    from .testnode import TestNODE 
+
+    # SETUP INNER GRAPH
     inner_app_graph = Graph(
-        nodes=(MainTestNODE, TestNODE),
-        state_type=TestState
+        nodes=(MainNODE, TestNODE), # ADD NODES HERE
+        state_type=InnerState
     )
-    # Set graph types for the in-memory persistence instance
+
+    # SET INNER GRAPH PERSISTENCE
     in_memory_persistence.set_graph_types(inner_app_graph) # Corrected call
 
+    # RUN INNER GRAPH
     try:
         # No need to load initial snapshot for a fresh in-memory persistence run typically,
         # unless you have a more complex resumption logic for the inner graph itself.
-        start_test_node = MainTestNODE()
-        current_test_state = TestState()
+        start_node = MainNODE()
+        current_state = InnerState()
 
         # No file to clear
 
-        async with inner_app_graph.iter(start_test_node, state=current_test_state, persistence=in_memory_persistence) as run:
+        async with inner_app_graph.iter(start_node, state=current_state, persistence=in_memory_persistence) as run:
             while True:
                 next_node_or_end = await run.next()
                 if isinstance(next_node_or_end, End):
                     break
-            final_test_state = current_test_state
+            final_state = current_state
         
         # After the run, get snapshots using the persistence object's own type adapter
         if hasattr(in_memory_persistence, '_snapshots_type_adapter') and in_memory_persistence._snapshots_type_adapter:
@@ -98,7 +108,7 @@ async def test_graph():
                 # exclude_unset=True # Optional: if you want to skip fields that were not explicitly set
             )
         else:
-            logging.error("[test_graph] Snapshot type adapter not found or not set on in_memory_persistence!")
+            logging.error("Snapshot type adapter not found or not set on in_memory_persistence!")
             session_snapshots = [] # Default to empty list if adapter is missing
 
     except Exception as e:
@@ -107,6 +117,6 @@ async def test_graph():
         if 'session_snapshots' not in locals():
             session_snapshots = []
     finally:
-        exit_status = final_test_state.exit_app if final_test_state else False
+        exit_flag = final_state.exit_app if final_state else False
         logging.info(f"Returning in-memory snapshots\n: {session_snapshots}")
-        return exit_status, session_snapshots
+        return exit_flag, session_snapshots

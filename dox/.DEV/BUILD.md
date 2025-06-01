@@ -62,6 +62,6 @@ git branch -M main
 git remote add origin https://github.com/{YOUR_GITHUB_USERNAME}/{YOUR_GITHUB_REPONAME}.git
 git remote -v
 git add .
-git commit -m ""
+git commit -m "Finalized Template"
 git push -u origin main
 ```
