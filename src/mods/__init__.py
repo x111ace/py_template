@@ -3,9 +3,10 @@
 from pydantic_graph import BaseNode, GraphRunContext, End
 from typing import Optional, Union, List, Dict, Any
 from dataclasses import dataclass, field
+from pydantic import BaseModel, Field
 from datetime import datetime
 
-import os, re, sys, glob, time, shutil, logging, collections
+import os, re, sys, glob, time, shutil, asyncio, logging, collections
 
 from colorama import init, Fore, Style
 init(autoreset=True)
@@ -44,8 +45,12 @@ logging.basicConfig(
 MOD_DIR = os.path.dirname(os.path.abspath(__file__))
 SRC_DIR = os.path.abspath(os.path.join(MOD_DIR, '..'))
 ROOTPTH = os.path.abspath(os.path.join(SRC_DIR, '..'))
-
 ENV_PATH = os.path.join(ROOTPTH, '.env')
+
+GRAPH_DIR = os.path.abspath(os.path.join(MOD_DIR, 'graph'))
+STATE_DIR = os.path.abspath(os.path.join(GRAPH_DIR, 'state'))
+if not os.path.exists(STATE_DIR):
+    os.makedirs(STATE_DIR, exist_ok=True)
 
 ind1_4 = "    "
 ind2_4 = "        "

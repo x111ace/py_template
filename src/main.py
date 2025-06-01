@@ -6,13 +6,12 @@
 
 # ADD FORWARD DECLARED NODES HERE AFTER STATE AND MAIN NODE
 
-from src.mods.graph import AppState, MainMenu, ExampleNode, ExampleGraphNODE
+from src.mods.graph import AppState, MainMenu, ExampleNode
 from src.mods.__init__ import *
 from src.mods.utils import *
 
-from pydantic_graph import Graph
-import asyncio
-import os
+from pydantic_graph import Graph 
+# import os, asyncio
 
 ###################################
 # --- Define from __init__.py --- #
@@ -38,7 +37,6 @@ if ROOTED != ROOTPTH:
 else:
     ROOTPTH = ROOTED
 
-# Obj: - 2:
 FILEi = print_file_path 
 TR33 = print_project_tree
 
@@ -48,7 +46,7 @@ def main_graph():
     initial_node = MainMenu()
     state = AppState()
     app_graph = Graph(
-        nodes=(MainMenu, ExampleNode, ExampleGraphNODE), # ADD NODES HERE
+        nodes=(MainMenu, ExampleNode), # ADD NODES HERE
         state_type=AppState)
     asyncio.run(app_graph.run(initial_node, state=state))
 

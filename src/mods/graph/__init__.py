@@ -6,22 +6,21 @@ from ..utils import *
 
 
 # MAIN APP STATE
-class AppState:
-    pass
+class AppState(BaseModel):
+    exit_app: bool = False
 
 
 
 # ADD FORWARD DECLARATION FOR ALL NODES HERE
 # ENSURE IT USES THE CORRECT NODE CLASS NAME
 class ExampleNode(BaseNode[AppState]): ...
-class ExampleGraphNODE(BaseNode[AppState]): ...
 
 
 
 @dataclass
 class MainMenu(BaseNode[AppState]): # INIT/MAIN NODE
     async def run(self, ctx: GraphRunContext[AppState]
-                  ) -> Union[End, ExampleNode, ExampleGraphNODE]: # ADD NODES HERE
+                  ) -> Union[End, ExampleNode]: # ADD NODES HERE
         print("\n--- MAIN MENU ---\n"
               "\n[0] Exit\n"
               "\n[1] Example Node"
@@ -50,16 +49,20 @@ class MainMenu(BaseNode[AppState]): # INIT/MAIN NODE
 
 
             elif main_menu_option == "2":
-                # # ADD GRAPH IMPORT HERE 
-                # from .test import test_graph
-                # # PREVENTS CIRCULAR IMPORTS
-                # return test_graph()
-                # --- --- --- --- --- --- --- --- ---
-                # ADD NODE IMPORT HERE 
-                from .test import ExampleGraphNODE
+                # ADD GRAPH IMPORT HERE 
+                from .test import test_graph
                 # PREVENTS CIRCULAR IMPORTS
-                return ExampleGraphNODE()
+                await test_graph()
+                # THIS PART WON'T WORK IF
+                # USING A NODE vs FUNCTION
+                if ctx.state.exit_app:
+                    return End(None)
+
 
 
             else:
                 printR("\nInvalid choice. Please try again.", speed=0.01)
+
+
+
+            return End(None)
