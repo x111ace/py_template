@@ -215,3 +215,13 @@ def printR(text, speed=0.03, end='\n', flush=True, mode=None, elipses=False):
     sys.stdout.write(end)
     if flush:
         sys.stdout.flush()
+
+#####################################
+# --- Mermaid Graph Persistence --- #
+#####################################
+
+# def mermaid_graph(snapshots):
+#     """
+#     Generate a Mermaid graph from a list of snapshots.
+#     """
+#     pass

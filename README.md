@@ -1,5 +1,3 @@
-# NEW PY PROJECT TEMPLATE
+# py_template
 
-A template I use for quickly building Python Projects. The only dependency is `pytest`.
-It's a rough draft, but it has the essentials and some functions I want to have always. 
-It's an easy setup to build quickly with, it handles the little things like file paths.
+This Python project template is setup as a FSM with an outer and inner graph for quick idea implementation.

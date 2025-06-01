@@ -34,8 +34,10 @@ class ExampleNode(BaseNode[AppState]): ...
 
 @dataclass
 class MainMenu(BaseNode[AppState]): # INIT/MAIN NODE
+    docstring_notes = True
     async def run(self, ctx: GraphRunContext[AppState]
-                  ) -> Union[End, ExampleNode]: # Use string literal for self-reference
+                #   ) -> Annotated[Union[End, ExampleNode], Edge(label="Main Menu Entry or Exit?")]:
+                  ) -> Union[End, "ExampleNode"]:
         print("\n--- MAIN MENU ---\n"
               "\n[0] Exit\n"
               "\n[1] Example Node"
@@ -67,7 +69,7 @@ class MainMenu(BaseNode[AppState]): # INIT/MAIN NODE
                     ctx.state.i_graph_ = None
 
                 # ADD GRAPH IMPORT HERE 
-                from .test import test_graph
+                from .inner import test_graph
                 # RUN INNER GRAPH AND RETURN SNAPSHOTS OR EXIT FLAG
                 exit_flag, returned_snapshots = await test_graph()
 

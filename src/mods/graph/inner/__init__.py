@@ -1,5 +1,6 @@
 # src/mods/graph/test/__init__.py
 
+from pydantic_graph.mermaid import generate_code as mermaid_code_generator # Added import
 from pydantic_graph.persistence.in_mem import FullStatePersistence
 from pydantic_graph import Graph
 import pydantic
@@ -64,7 +65,7 @@ class MainNODE(BaseNode[InnerState]): # INIT/MAIN NODE
 
 
 
-async def test_graph():
+async def test_graph(persist=False, mermaid=False):
     printR("\nHello, from `ExampleGraph`! Beginning a new graph...", speed=0.01)
     session_snapshots: Optional[List[Dict[str, Any]]] = [] # Initialize as empty list
     # Use in-memory FullStatePersistence to track the inner graph's session snapshots
@@ -118,5 +119,13 @@ async def test_graph():
             session_snapshots = []
     finally:
         exit_flag = final_state.exit_app if final_state else False
-        logging.info(f"Returning in-memory snapshots\n: {session_snapshots}")
+        if persist == True:
+            logging.info(f"Returning in-memory snapshots.\n: {session_snapshots}")
+
+        if mermaid == True:
+            # --- Generate and Print Mermaid Code ---
+            mermaid_output = mermaid_code_generator(inner_app_graph, start_node=start_node, direction='TB')
+            logging.info("Mermaid Diagram Code (Inner Graph)\n```mermaid\n" + mermaid_output + "\n```")
+
         return exit_flag, session_snapshots
+    

@@ -1,15 +1,16 @@
 # py_template/src/mods/__init__.py
 
-from pydantic_graph import BaseNode, GraphRunContext, End
-from typing import Optional, Union, List, Dict, Any
+import os, re, sys, glob, time, shutil, signal, asyncio, logging, collections
+
+from pydantic_graph import BaseNode, GraphRunContext, End, Edge
+from typing import Annotated, Optional, Union, List, Dict, Any
 from dataclasses import dataclass, field
 from pydantic import BaseModel, Field
 from datetime import datetime
 from pathlib import Path
 
-import os, re, sys, glob, time, shutil, signal, asyncio, logging, collections
-
 from colorama import init, Fore, Style
+
 init(autoreset=True)
 nrm = Style.RESET_ALL
 red = Fore.RED
@@ -47,6 +48,8 @@ MOD_DIR = os.path.dirname(os.path.abspath(__file__))
 SRC_DIR = os.path.abspath(os.path.join(MOD_DIR, '..'))
 ROOTPTH = os.path.abspath(os.path.join(SRC_DIR, '..'))
 ENV_PATH = os.path.join(ROOTPTH, '.env')
+from dotenv import load_dotenv
+load_dotenv(dotenv_path=ENV_PATH)
 
 GRAPH_DIR = os.path.abspath(os.path.join(MOD_DIR, 'graph'))
 STATE_DIR = os.path.abspath(os.path.join(GRAPH_DIR, 'state'))
@@ -55,7 +58,7 @@ if not os.path.exists(STATE_DIR):
 
 APP_PERSISTENCE_FILE = Path(os.path.join(STATE_DIR, 'app_graph_state.json'))
 
-INNER_GRAPH_DIR = os.path.abspath(os.path.join(GRAPH_DIR, 'test'))
+INNER_GRAPH_DIR = os.path.abspath(os.path.join(GRAPH_DIR, 'inner'))
 # INNER_STATE_DIR = os.path.abspath(os.path.join(INNER_GRAPH_DIR, 'state'))
 # if not os.path.exists(INNER_STATE_DIR):
 #     os.makedirs(INNER_STATE_DIR, exist_ok=True)
@@ -66,6 +69,3 @@ ind1_4 = "    "
 ind2_4 = "        "
 ind3_4 = "            "
 ind4_4 = "                "
-
-from dotenv import load_dotenv
-load_dotenv(dotenv_path=ENV_PATH)

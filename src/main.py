@@ -4,15 +4,15 @@
 # --- Import Project Modules --- #
 ##################################
 
-# ADD FORWARD DECLARED NODES HERE AFTER STATE AND MAIN NODE
+from pydantic_graph.mermaid import generate_code as mermaid_code_generator # Added import
+from pydantic_graph.persistence.file import FileStatePersistence # Added import
+from pydantic_graph import Graph
 
 from src.mods.graph import AppState, MainMenu
 from src.mods.graph.example import ExampleNode
+
 from src.mods.__init__ import *
 from src.mods.utils import *
-
-from pydantic_graph.persistence.file import FileStatePersistence # Added import
-from pydantic_graph import Graph
 
 ###################################
 # --- Define from __init__.py --- #
@@ -43,7 +43,7 @@ TR33 = print_project_tree
 
 # --- --- --- --- --- --- --- --- ---
 
-def main_graph(persist=True):
+def main_graph(persist=False, mermaid=False):
     initial_node = MainMenu()
     state = AppState()
     app_graph = Graph(
@@ -84,8 +84,14 @@ def main_graph(persist=True):
     if persist == False and APP_PERSISTENCE_FILE.exists():
         os.remove(APP_PERSISTENCE_FILE)
 
+    # --- Generate and Print Mermaid Code ---
+    if mermaid == True:
+        mermaid_output = mermaid_code_generator(app_graph, start_node=initial_node, direction='TB')
+        logging.info("Mermaid Diagram Code (Main Graph)\n```mermaid\n" + mermaid_output + "\n```")
+
+
 def main():
     # FILEi(MOD=MOD_DIR, DIR=SRC_DIR, ROOT=ROOTPTH, output=True)
     # TR33(ROOT=ROOTPTH, output=True)
-    main_graph(persist=False)
+    main_graph()
 
