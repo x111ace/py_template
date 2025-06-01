@@ -6,11 +6,13 @@
 
 # ADD FORWARD DECLARED NODES HERE AFTER STATE AND MAIN NODE
 
-from src.mods.graph import AppState, MainMenu, ExampleNode
+from src.mods.graph import AppState, MainMenu
+from src.mods.graph.example import ExampleNode
 from src.mods.__init__ import *
 from src.mods.utils import *
 
-from pydantic_graph import Graph 
+from pydantic_graph.persistence.file import FileStatePersistence # Added import
+from pydantic_graph import Graph
 # import os, asyncio
 
 ###################################
@@ -48,9 +50,38 @@ def main_graph():
     app_graph = Graph(
         nodes=(MainMenu, ExampleNode), # ADD NODES HERE
         state_type=AppState)
-    asyncio.run(app_graph.run(initial_node, state=state))
+
+    # --- Persistence Setup ---
+    persistence = FileStatePersistence(APP_PERSISTENCE_FILE)
+    persistence.set_graph_types(app_graph) # Register graph types
+
+    # --- Graph Execution with Persistence ---
+    async def run_with_persistence():
+        # Try to load from persistence, otherwise start fresh
+        initial_snapshot = await persistence.load_next()
+        start_node = initial_snapshot.node if initial_snapshot else initial_node
+        current_state = initial_snapshot.state if initial_snapshot else state
+        
+        if APP_PERSISTENCE_FILE.exists() and initial_snapshot: # Clear if we loaded something
+            try:
+                os.remove(APP_PERSISTENCE_FILE)
+            except Exception as e:
+                print(f"[WARNING] Could not clear old persistence file: {e}")
+
+        async with app_graph.iter(start_node, state=current_state, persistence=persistence) as run:
+            while True:
+                next_node_or_end = await run.next()
+                if isinstance(next_node_or_end, End):
+                    # print(f"Graph ended with: {next_node_or_end.data}") # Optional: for debugging
+                    break
+                # print(f"Next node: {type(next_node_or_end).__name__}") # Optional: for debugging
+
+    asyncio.run(run_with_persistence())
+    # Clear persistence file automatically after execution
+    os.remove(APP_PERSISTENCE_FILE)
 
 def main():
     # FILEi(MOD=MOD_DIR, DIR=SRC_DIR, ROOT=ROOTPTH, output=True)
-    TR33(ROOT=ROOTPTH, output=True)
+    # TR33(ROOT=ROOTPTH, output=True)
     main_graph()
+

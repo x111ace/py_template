@@ -5,6 +5,7 @@ from typing import Optional, Union, List, Dict, Any
 from dataclasses import dataclass, field
 from pydantic import BaseModel, Field
 from datetime import datetime
+from pathlib import Path
 
 import os, re, sys, glob, time, shutil, asyncio, logging, collections
 
@@ -51,6 +52,15 @@ GRAPH_DIR = os.path.abspath(os.path.join(MOD_DIR, 'graph'))
 STATE_DIR = os.path.abspath(os.path.join(GRAPH_DIR, 'state'))
 if not os.path.exists(STATE_DIR):
     os.makedirs(STATE_DIR, exist_ok=True)
+
+APP_PERSISTENCE_FILE = Path(os.path.join(STATE_DIR, 'app_graph_state.json'))
+
+INNER_GRAPH_DIR = os.path.abspath(os.path.join(GRAPH_DIR, 'test'))
+# INNER_STATE_DIR = os.path.abspath(os.path.join(INNER_GRAPH_DIR, 'state'))
+# if not os.path.exists(INNER_STATE_DIR):
+#     os.makedirs(INNER_STATE_DIR, exist_ok=True)
+
+# TEST_APP_PERSISTENCE_FILE = Path(os.path.join(INNER_STATE_DIR, 'test_app_graph_state.json'))
 
 ind1_4 = "    "
 ind2_4 = "        "
