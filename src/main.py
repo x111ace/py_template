@@ -89,7 +89,6 @@ def main_graph(persist=False, mermaid=False):
         mermaid_output = mermaid_code_generator(app_graph, start_node=initial_node, direction='TB')
         logging.info("Mermaid Diagram Code (Main Graph)\n```mermaid\n" + mermaid_output + "\n```")
 
-
 def main():
     # FILEi(MOD=MOD_DIR, DIR=SRC_DIR, ROOT=ROOTPTH, output=True)
     # TR33(ROOT=ROOTPTH, output=True)

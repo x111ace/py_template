@@ -30,7 +30,7 @@ def print_project_tree(ROOT, output=False):
 
     def _tree(dir_path, prefix=""):
         # Exclude __pycache__ and .git folders
-        entries = [e for e in os.listdir(dir_path) if e not in ("__pycache__", ".pytest_cache", ".git", "venv", "venv_test")]
+        entries = [e for e in os.listdir(dir_path) if e not in ("__pycache__", ".pytest_cache", ".git", "venv", "venv_test", ".DEV")]
         folders = sorted([e for e in entries if os.path.isdir(os.path.join(dir_path, e))])
         files = sorted([e for e in entries if not os.path.isdir(os.path.join(dir_path, e))])
         sorted_entries = folders + files
@@ -215,13 +215,3 @@ def printR(text, speed=0.03, end='\n', flush=True, mode=None, elipses=False):
     sys.stdout.write(end)
     if flush:
         sys.stdout.flush()
-
-#####################################
-# --- Mermaid Graph Persistence --- #
-#####################################
-
-# def mermaid_graph(snapshots):
-#     """
-#     Generate a Mermaid graph from a list of snapshots.
-#     """
-#     pass
